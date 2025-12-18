@@ -1,0 +1,6 @@
+OCA/partner-contact:
+  - animal
+  - partner_firstname
+
+OCA/sale-workflow:
+  - sale_order_type
