@@ -4,7 +4,7 @@
   remotes:
     origin: gh:OCA/partner-contact
   merges:
-    - origin 18.0
+    - origin eb05e17aecbc95f2a3ffc4c8023d0a3b91adb979
 
 ./OCA/sale-workflow:
   defaults:
@@ -12,7 +12,7 @@
   remotes:
     oca: gh:OCA/sale-workflow
   merges:
-    - oca 18.0
+    - oca 7389eef80a773541ef64e3b8a25be2914cebfe08
 
 
   # ./ife/ife_expense_calculation:

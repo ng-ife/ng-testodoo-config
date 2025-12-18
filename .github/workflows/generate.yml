@@ -1,0 +1,77 @@
+name: IFE Deployer
+
+on:
+  push:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Clone config repo into ./config
+      - name: Checkout config repo
+        uses: actions/checkout@v4
+        with:
+          path: config
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configure git auth for private GitHub repos
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.IFE_REPOS_TOKEN }}@github.com/".insteadOf "gh:"
+          git config --global url."https://x-access-token:${{ secrets.IFE_DEPLOYER_TOKEN }}@github.com/".insteadOf "https://gh-deployer/"
+          git config --global url."https://x-access-token:${{ secrets.CUSTOMER_DEPLOYER_TOKEN }}@github.com/".insteadOf "gh-customer:"
+          git config --global user.name "IFE Deployer Bot"
+          git config --global user.email "ife-deployer-bot@users.noreply.github.com"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "git+https://gh-deployer/ifegmbh/ife-deployer.git"
+
+      - name: Export config.yaml entries as environment variables
+        run: |
+          python - << 'PY'
+          import yaml, os, re
+
+          with open('config/config.yaml') as f:
+              cfg = yaml.safe_load(f) or {}
+
+          def to_env_key(key: str) -> str:
+              # Uppercase, replace non-alnum with _
+              k = re.sub(r'[^0-9A-Za-z_]', '_', str(key)).upper()
+              # Env var must not start with a digit
+              if not re.match(r'[A-Z_]', k[0]):
+                  k = f'CFG_{k}'
+              return k
+
+          github_env = os.environ["GITHUB_ENV"]
+
+          with open(github_env, "a") as env_file:
+              for key, value in cfg.items():
+                  env_key = to_env_key(key)
+                  env_val = "" if value is None else str(value)
+                  env_file.write(f"{env_key}={env_val}\n")
+                  print(f"Exported {env_key}={env_val!r}")
+          PY
+
+      - name: Clone customer repo into addons
+        run: |
+          if [ -z "${BRANCH}" ]; then
+            BRANCH=$(git -C config rev-parse --abbrev-ref HEAD)
+          fi
+          git clone "$CUSTOMER_REPO" addons -b "$BRANCH" --depth 1
+
+      - name: Run ife-deployer generate
+        run: |
+          ife-deployer generate
+
+      - name: Commit & push changes
+        run: |
+          cd addons
+          git add .
+          git commit -m "Automated deployment update" || echo "No changes to commit"
+          git push origin HEAD

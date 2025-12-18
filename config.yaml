@@ -1,2 +1,3 @@
 VERSION: "18.0"
-CUSTOMER_REPO: "gh:ng-ife/ng-testodoo.git"
+CUSTOMER_REPO: "gh-customer:ng-ife/ng-testodoo.git"
+# BRANCH: "PRE"
