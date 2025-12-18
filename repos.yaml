@@ -15,11 +15,11 @@
     - oca 18.0
 
 
-  # ./ife/ife_expense_calculation:
-  # defaults:
-  #   depth: 1
-  #   branch: 16.0-ife-legacy  # hucke_expense_calculation
-  # remotes:
-  #   ife: gh:ifegmbh/ife_expense_calculation
-  # merges:
-  #   - ife bda86de84887a5ac5735d3788ca1109be4a11ef2    
+./ife/ife_textblock:
+  defaults:
+    depth: 50
+  remotes:
+    ife: gh:ifegmbh/ife_textblock
+  merges:
+    - ife 18.0
+    - ife refs/pull/74/head

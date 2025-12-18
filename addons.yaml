@@ -4,3 +4,6 @@ OCA/partner-contact:
 
 OCA/sale-workflow:
   - sale_order_type
+
+ife/ife_textblock:
+  - "*"
